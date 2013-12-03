@@ -54,6 +54,9 @@ Usage: git-commit-mv [[-c|-C] <commit> [-x]] [--bugz <bugno>] [--type <string>]
 		Append a "(commit cherry-picked from XXXXXX)" line.
 		May only be used with -c or -C.  This option is intended for
 		use by other commands.
+	--ncd
+		Don't use this option.  Let it be computed for you.  This
+		option is intended for use by other commands.
 """
 
 
@@ -103,7 +106,7 @@ def process_options():
     long_opts = [
 	"help", "debug", "version", "source=", "bugz=", "mr=", "type=",
 	"disposition=", "changeid=", "no-edit", "no-signoff",
-	"amend", "reset_author",
+	"amend", "reset_author", "ncd",
     ]
 
     try:
@@ -155,6 +158,8 @@ def process_options():
 	    opt['reset_author'] = True
 	elif option == '-x':
 	    opt['add-picked-message'] = True
+	elif option == '--ncd':
+	    opt['ncd'] = True
 	elif value:
 	    if option.startswith("--"):
 		opt["commit_options"] += [option, value]
@@ -185,7 +190,6 @@ def process_options():
 	else:
 	    sys.stdout.write('Error: Invalid commit "%s".\n' % id)
 	    sys.exit(1)
-
 
 def generate_changeid(header, body):
     hcmd = ['git', 'hash-object', '--stdin']
@@ -258,6 +262,7 @@ def commit_message():
 	if opt['add-picked-message']:
 	    body.append("(cherry picked from commit %s)" % message_commit.id)
 
+    # override defaults with what is in mv style header
 	if 'mr' in mv_header_dict:
 	    bugz = mv_header_dict['mr']
 	if 'source' in mv_header_dict:
@@ -269,19 +274,39 @@ def commit_message():
 	if 'changeid' in mv_header_dict:
 	    changeid = mv_header_dict['changeid']
 
-    if opt["source"]:
-    	source = opt["source"]
+	# Use NCD source and dispostion.
+	# Save NCD bugz # 
+	if opt.get('ncd', ""):
+		if not opt['add-picked-message']:
+			body.append("(cherry picked from commit %s)" % message_commit.id)
+		if bugz.startswith('Bugzilla'):
+			bugz = opt["bugz"]
+		else:
+			body.append("NCD Bug#: %s" % bugz)
+			bugz = opt["bugz"]
+
+	if not opt.get('ncd', ""):
+		if opt["source"]:
+		 	source = opt["source"]
+   		if opt["disposition"]:
+			disposition = opt["disposition"]
+	else:
+		if 'source' not in mv_header_dict:
+		 	source = opt["source"]
+		if 'disposition' not in mv_header_dict:
+			disposition = opt["disposition"]
+
+
     if opt["bugz"]:
 	if bugz.startswith('Bugzilla'):
 	    bugz = opt["bugz"]
 	else:
-	    bugz = bugz.split(',', 2)[0].strip()
-	    if bugz != opt["bugz"]:
-		bugz += ", " + opt["bugz"]
+	    if not opt.get('ncd', ''):
+		    bugz = bugz.split(',', 2)[0].strip()
+		    if bugz != opt["bugz"]:
+			bugz += ", " + opt["bugz"]
     if opt["type"]:
 	type = opt["type"]
-    if opt["disposition"]:
-	disposition = opt["disposition"]
 
     if addsignoff:
 	cmd = ['git', 'var', 'GIT_COMMITTER_IDENT']
@@ -306,7 +331,7 @@ Disposition: %s
 
     if opt["delete_changeid"]:
 	changeid = None
-    elif opt['repo-type'] == 'mvl6-kernel':
+    elif opt['repo-type'] in ['mvl6-kernel', 'mvl7-kernel']:
 	if opt["changeid"]:
 	    changeid = opt["changeid"]
 	elif not changeid:

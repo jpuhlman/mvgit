@@ -22,6 +22,8 @@ Usage: git-cherry-pick-mv [opts] <commit>...
 		Provides the value of the MR: field of the MV-header.
 	--type <type>
 		Provides the value of the Type: field of the MV-header.
+    --ncd
+        Identify a commit as having a MV style header.
 	--disposition <disposition>
 		Provides the value of the Disposition: field of the MV-header.
 
@@ -61,7 +63,8 @@ config = {
     "disposition"	: None,
     "gitdir"		: "",
     "commits_done"	: 0,
-    "skipped_commits"	: []
+    "skipped_commits"	: [],
+    "ncd"		: False,
 }
 
 
@@ -83,7 +86,7 @@ def process_options():
 	"help", "debug", "version", "edit",
 	"ff", "continue", "skip", "abort", "stdin",
 	"source=", "bugz=", "mr=", "type=", "disposition=",
-	"no-commit",
+	"no-commit", "ncd",
     ]
 
     noargs = False
@@ -134,6 +137,8 @@ def process_options():
 	    config["merges_ok"] = True
 	elif option in ('-n', '--no-commit'):
 	    config['nocommit'] = True
+	elif option in ('--ncd'):
+	    config['ncd'] = True
 	elif value:
 	    if option.startswith("--"):
 		config["cherry_options"] += [option, value]
@@ -492,6 +497,9 @@ def do_commit(commit):
 	commit_options += ['--disposition', config['disposition']]
     if git.mvl6_kernel_repo():
 	commit_options += ['--changeid', git.read_commit(commit).changeid]
+    if git.repo_type() == 'mvl7-kernel':
+	if config['ncd']:
+		commit_options += ['--ncd']
 
     cmd = ["git", "commit-mv"] + commit_options
     edit = config["edit"]

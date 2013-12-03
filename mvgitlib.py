@@ -7,7 +7,7 @@ It includes functions to work with git limbs as defined for MVL6.
 '''
 
 # Author: Dale Farnsworth <dfarnsworth@mvista.com>
-# Copyright (C) 2009-2011 MontaVista Software, Inc.
+# Copyright (C) 2009-2013 MontaVista Software, Inc.
 #
 # This file is licensed under the terms of the GNU General Public License
 # version 2. This program is licensed "as is" without any warranty of any
@@ -1690,6 +1690,8 @@ def repo_type():
 	    remote_url = call(cmd, error=None, stderr=None).strip()
 	    if '/git/kernel/mvlinux.git' in remote_url:
 		cached_repo_type = 'mvl6-kernel'
+	    if '/git/mvl7/mvl7kernel.git' in remote_url:
+		cached_repo_type = 'mvl7-kernel'
 		break
 	elif case == 2:
 	    cmd = ['git', 'branch', '-r']
@@ -1697,11 +1699,14 @@ def repo_type():
 		if 'mvl-' in branch_name and '/limb-info' in branch_name:
 		    cached_repo_type = 'mvl6-kernel'
 		    break
+		if 'mvl7-' in branch_name and '/limb-info' in branch_name:
+		    cached_repo_type = 'mvl7-kernel'
+		    break
 	    else:
 		continue
 	    break
 	elif case == 3:
-	    cached_repo_type = 'non-mvl6-kernel'
+	    cached_repo_type = 'non-mvl-kernel'
 	    break
 
     cmd = ['git', 'config', 'mvista.repo-type', cached_repo_type]
@@ -1711,11 +1716,13 @@ def repo_type():
 
 
 def mvl6_kernel_repo():
-    return repo_type() == 'mvl6-kernel'
+    if repo_type() != 'mvl6-kernel' or repo_type() != 'mvl7-kernel':
+        return False
+    return True
 
 
 def require_mvl6_kernel_repo():
-    if repo_type() != 'mvl6-kernel':
+    if repo_type() not in ['mvl6-kernel', 'mvl7-kernel']:
 	sys.stderr.write("""
 This command is intended only for use in MVL6 (and later) kernel repositories.
 You may annotate an MVL6 repository as such by running:
