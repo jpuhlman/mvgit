@@ -1716,7 +1716,7 @@ def repo_type():
 
 
 def mvl6_kernel_repo():
-    if repo_type() != 'mvl6-kernel' or repo_type() != 'mvl7-kernel':
+    if repo_type() != 'mvl6-kernel' and repo_type() != 'mvl7-kernel':
         return False
     return True
 
