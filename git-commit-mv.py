@@ -277,8 +277,9 @@ def commit_message():
 	# Use NCD source and dispostion.
 	# Save NCD bugz # 
 	if opt.get('ncd', ""):
-		if not opt['add-picked-message']:
-			body.append("(cherry picked from commit %s)" % message_commit.id)
+		if 'changeid' in mv_header_dict:
+			body.append("(cherry picked from ncd %s)" % message_commit.id)
+
 		if bugz.startswith('Bugzilla'):
 			bugz = opt["bugz"]
 		else:
