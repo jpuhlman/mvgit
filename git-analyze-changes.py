@@ -285,6 +285,9 @@ def summarize_commits(branches, action):
 	if branch.subname.startswith('external.'):
 	    continue
 
+	if branch.subname.startswith('internal.'):
+	    continue
+
 	if not branch.commits_with_change:
 	    continue
 
@@ -371,6 +374,8 @@ def summarize_commits(branches, action):
 			picked_branch = commit.from_branches[-1]
 			if not picked_branch.subname.startswith('external.'):
 			    continue
+			if not picked_branch.subname.startswith('internal.'):
+			    continue
 		    elif change != 'created':
 			continue
 		write_commit(file, commit, change, branch)
@@ -394,7 +399,7 @@ def summarize_new_commits(branches):
     commits_without_bugz = []
     errors = 0
     for branch in branches:
-	if branch.subname.startswith('external.'):
+	if branch.subname.startswith('external.') or branch.subname.startswith('internal.'):
 	    for commit, change in branch.commits_with_change:
 		if change == 'deleted' or change == 'rebased':
 		    notice('Commit %s in %s was %s.\n' %
@@ -428,7 +433,7 @@ def summarize_new_commits(branches):
     if errors:
 	notice('\n')
 
-    notice('All new commits in non-external branches are signed-off by:\n')
+    notice('All new commits in non-external or non-internal branches are signed-off by:\n')
     if all_signoffs:
 	all_signoffs = list(all_signoffs)
 	all_signoffs.sort()
@@ -533,6 +538,8 @@ def check_bitbake_files(branch):
 
 
 def check_msd_branch(branch):
+    if git.repo_type() == 'mvl7-kernel:
+        return
     check_kernel_defconfigs(branch)
     check_bitbake_files(branch)
 
