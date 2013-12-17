@@ -538,7 +538,7 @@ def check_bitbake_files(branch):
 
 
 def check_msd_branch(branch):
-    if git.repo_type() == 'mvl7-kernel:
+    if git.repo_type() == 'mvl7-kernel':
         return
     check_kernel_defconfigs(branch)
     check_bitbake_files(branch)
