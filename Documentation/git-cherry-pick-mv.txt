@@ -12,7 +12,7 @@ SYNOPSIS
 [verse]
 'git cherry-pick-mv' [-x] [--bugz <bugno>] [--source <source>]
 		   [--disposition <disposition>] [--type <type>]
-		   [-e | --edit] [-m] [--no-signoff]
+		   [-e | --edit] [-m] [--no-signoff] [--ncd]
 		   [--stdin] [--]
 		   [<commit>...]
 'git cherry-pick-mv' --version
@@ -75,6 +75,8 @@ that has stopped in the middle due to need for programmer intervention.
 --disposition <string>::
 	Fill in the "Disposition:" field of the MontaVista commit header with
 	the string specified in the command option.
+--ncd::
+	Identify a commit as having a MV style header.
 	
 <commits>...::
 	The set of commits to be cherry picked may be either a list of

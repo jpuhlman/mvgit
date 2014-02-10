@@ -22,8 +22,8 @@ Usage: git-cherry-pick-mv [opts] <commit>...
 		Provides the value of the MR: field of the MV-header.
 	--type <type>
 		Provides the value of the Type: field of the MV-header.
-    --ncd
-        Identify a commit as having a MV style header.
+        --ncd
+                Identify a commit as having a MV style header.
 	--disposition <disposition>
 		Provides the value of the Disposition: field of the MV-header.
 

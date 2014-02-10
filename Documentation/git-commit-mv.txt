@@ -11,7 +11,7 @@ SYNOPSIS
 'git commit-mv' [[-c|-C] <commit> [-x]] [--bugz <bugno>]
 		[--type <string>] [--disposition <string>]
 		[--source <string>] [--changeid <hash>]
-		[--no-edit] [--no-signoff] [--amend]
+		[--no-edit] [--no-signoff] [--ncd] [--amend]
 		[git-commit options]
 'git commit-mv' --version
 
@@ -75,6 +75,9 @@ OPTIONS
 --no-signoff::
 	Default behavior is to add a Signed-off-by: line to the end of the
 	commit message.  This option disables that.
+--ncd::
+	Don't use this option.  Let it be computed for you.  This
+	option is intended for use by other commands.
 
 --amend::
 	Instead of creating a new commit, amend the commit at the tip
