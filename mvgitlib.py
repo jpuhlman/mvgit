@@ -915,6 +915,12 @@ class Branch(Ref):
         ref = "%s:%s" % (self.id, 'MONTAVISTA/merge_base')
         cmd = ['git', 'show', ref]
         version = call(cmd, error=None, stderr=None)
+        if not version:
+            info_branch = self.limb.info_branch
+            ref = "%s:%s%s" % (info_branch.id, 'MONTAVISTA/merge_base_',
+                               self.subname)
+            cmd = ['git', 'show', ref]
+            version = call(cmd, error=None, stderr=None)
         if version:
             version = re.sub('\n.*', '', version)
             cmd = ['git', 'rev-parse', version]
