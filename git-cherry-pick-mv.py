@@ -27,6 +27,9 @@ Usage: git-cherry-pick-mv [opts] <commit>...
 	--disposition <disposition>
 		Provides the value of the Disposition: field of the MV-header.
 
+	--reset-bugz
+		Provides allows the MR: field to be reset.
+
 	These options are passed directly to "git cherry-pick":
 		-x --ff
 	
@@ -65,6 +68,7 @@ config = {
     "commits_done"	: 0,
     "skipped_commits"	: [],
     "ncd"		: False,
+    "resetbugz"		: False,
 }
 
 
@@ -86,7 +90,7 @@ def process_options():
 	"help", "debug", "version", "edit",
 	"ff", "continue", "skip", "abort", "stdin",
 	"source=", "bugz=", "mr=", "type=", "disposition=",
-	"no-commit", "ncd",
+	"no-commit", "ncd", "reset-bugz"
     ]
 
     noargs = False
@@ -139,6 +143,8 @@ def process_options():
 	    config['nocommit'] = True
 	elif option in ('--ncd'):
 	    config['ncd'] = True
+	elif option in ('--reset-bugz'):
+	    config['resetbugz'] = True
 	elif value:
 	    if option.startswith("--"):
 		config["cherry_options"] += [option, value]
@@ -360,6 +366,7 @@ def initialize_commits():
     type = config["type"]
     disposition = config["disposition"]
     merges_ok = config["merges_ok"]
+    resetbugz = config["resetbugz"]
 
     if not edit and bugz == None:
 	sys.stdout.write("Either of --edit or --bugz options is required")
@@ -489,6 +496,8 @@ def do_commit(commit):
     commit_options = []
     if config['source']:
 	commit_options += ['--source', config['source']]
+    if config['resetbugz']:
+	    commit_options += ['--reset-bugz']
     if config['bugz']:
 	commit_options += ['--bugz', config['bugz']]
     if config['type']:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Usage: git-commit-mv [[-c|-C] <commit> [-x]] [--bugz <bugno>] [--type <string>]
-		     [--disposition <string>] [--source <string>]
+		     [--disposition <string>] [--source <string>] [--reset-bugz]
 		     [--no-edit] [--amend] [git-commit options]
 
        git-commit-mv --version
@@ -57,6 +57,9 @@ Usage: git-commit-mv [[-c|-C] <commit> [-x]] [--bugz <bugno>] [--type <string>]
 	--ncd
 		Don't use this option.  Let it be computed for you.  This
 		option is intended for use by other commands.
+    --reset-bugz
+		Don't use this option.  Let it be computed for you.  This
+		option is intended for use by other commands.
 """
 
 
@@ -86,6 +89,7 @@ opt = {
     "amend"		: False,
     "reset_author"	: False,
     "commit_options"	: [],
+    "reset_bugz"    : False,
 }
 
 
@@ -106,7 +110,7 @@ def process_options():
     long_opts = [
 	"help", "debug", "version", "source=", "bugz=", "mr=", "type=",
 	"disposition=", "changeid=", "no-edit", "no-signoff",
-	"amend", "reset_author", "ncd",
+	"amend", "reset_author", "ncd", "reset-bugz",
     ]
 
     try:
@@ -160,6 +164,8 @@ def process_options():
 	    opt['add-picked-message'] = True
 	elif option == '--ncd':
 	    opt['ncd'] = True
+	elif option == '--reset-bugz':
+	    opt['reset_bugz'] = True
 	elif value:
 	    if option.startswith("--"):
 		opt["commit_options"] += [option, value]
@@ -302,7 +308,10 @@ def commit_message():
 	if bugz.startswith('Bugzilla'):
 	    bugz = opt["bugz"]
 	else:
-	    if not opt.get('ncd', ''):
+		if opt.get('reset_bugz'):
+			bugz = opt["bugz"]
+
+		if not opt.get('ncd', '') or not opt.get('reset_bugz'):
 		    bugz = bugz.split(',', 2)[0].strip()
 		    if bugz != opt["bugz"]:
 			bugz += ", " + opt["bugz"]
