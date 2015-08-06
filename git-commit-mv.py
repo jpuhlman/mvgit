@@ -341,7 +341,7 @@ Disposition: %s
 
     if opt["delete_changeid"]:
 	changeid = None
-    else
+    else:
 	if opt["changeid"]:
 	    changeid = opt["changeid"]
 	elif not changeid:
