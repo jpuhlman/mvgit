@@ -122,8 +122,8 @@ def merge_limb():
         limb_branchname = "%s/%s" % (limbname, subname)
         remote_branchname = "%s/%s" % (remotename, subname)
 
-	limb_branch = Limb.get(limb_branchname)
-	remote_branch = Limb.get(remote_branchname)
+	limb_branch = git.Branch.get(limb_branchname)
+	remote_branch = git.Branch.get(remote_branchname)
 	if limb_branch.contains(remote_branch):
 	    sys.stdout.write("%s is up-to-date.\n" % limb_branchname)
 	    continue
