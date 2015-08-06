@@ -1175,8 +1175,6 @@ class Commit(object):
 	if not errors:
 	    for key in self.mv_header_fields.keys():
 		lkey = key.lower().rstrip(':')
-		if lkey == 'changeid' and not mvl6_kernel_repo():
-		    continue
 		if lkey not in dict:
 		    errors.append('missing "%s" MV header line\n' % key)
 
@@ -1657,12 +1655,8 @@ def remote_alias():
 
     cmd = ['git', 'config', '--get-regexp', r'remote\..*\.url']
     lines = call(cmd, error=None, stderr=None).splitlines()
-    mvlinux_lines = [x for x in lines if
-	x.endswith('/mvlinux.git') or x.endswith('/mvlinux')]
     if len(lines) == 1:
 	line = lines[0]
-    elif len(mvlinux_lines) == 1:
-	line = mvlinux_lines[0]
     else:
 	sys.stderr.write(
 	    '\nError: Cannot automatically determine the remote alias '
@@ -1676,62 +1670,3 @@ def remote_alias():
     roffset = len('.url')
     cached_remote_alias = name[loffset:-roffset]
     return cached_remote_alias
-
-
-cached_repo_type = None
-
-def repo_type():
-    global cached_repo_type
-    if cached_repo_type:
-	return cached_repo_type
-
-    cmd = ['git', 'config', 'mvista.repo-type']
-    cached_repo_type = call(cmd, error=None, stderr=None).strip()
-    if cached_repo_type:
-	return cached_repo_type
-
-    for case in (1, 2, 3):
-	if case == 1:
-	    cmd = ['git', 'config', 'remote.origin.url']
-	    remote_url = call(cmd, error=None, stderr=None).strip()
-	    if '/git/kernel/mvlinux.git' in remote_url:
-		cached_repo_type = 'mvl6-kernel'
-	    if '/git/mvl7/mvl7kernel.git' in remote_url:
-		cached_repo_type = 'mvl7-kernel'
-		break
-	elif case == 2:
-	    cmd = ['git', 'branch', '-r']
-	    for branch_name in call(cmd, error=None, stderr=None).splitlines():
-		if 'mvl-' in branch_name and '/limb-info' in branch_name:
-		    cached_repo_type = 'mvl6-kernel'
-		    break
-		if 'mvl7-' in branch_name and '/limb-info' in branch_name:
-		    cached_repo_type = 'mvl7-kernel'
-		    break
-	    else:
-		continue
-	    break
-	elif case == 3:
-	    cached_repo_type = 'non-mvl-kernel'
-	    break
-
-    cmd = ['git', 'config', 'mvista.repo-type', cached_repo_type]
-    call(cmd, error=None, stderr=None).strip()
-
-    return cached_repo_type
-
-
-def mvl6_kernel_repo():
-    if repo_type() != 'mvl6-kernel' and repo_type() != 'mvl7-kernel':
-        return False
-    return True
-
-
-def require_mvl6_kernel_repo():
-    if repo_type() not in ['mvl6-kernel', 'mvl7-kernel']:
-	sys.stderr.write("""
-This command is intended only for use in MVL6 (and later) kernel repositories.
-You may annotate an MVL6 repository as such by running:
-	git config mvista.repo-type mvl6-kernel
-""")
-	sys.exit(1)

@@ -337,7 +337,6 @@ def main():
 
     try:
 	git.check_repository()
-	git.require_mvl6_kernel_repo()
 
 	if config["deps"]:
 	    git_list_dependencies()

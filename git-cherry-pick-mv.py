@@ -504,11 +504,7 @@ def do_commit(commit):
 	commit_options += ['--type', config['type']]
     if config['disposition']:
 	commit_options += ['--disposition', config['disposition']]
-    if git.mvl6_kernel_repo():
-	commit_options += ['--changeid', git.read_commit(commit).changeid]
-    if git.repo_type() == 'mvl7-kernel':
-	if config['ncd']:
-		commit_options += ['--ncd']
+    commit_options += ['--changeid', git.read_commit(commit).changeid]
 
     cmd = ["git", "commit-mv"] + commit_options
     edit = config["edit"]

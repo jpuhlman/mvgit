@@ -256,10 +256,6 @@ def summarize_branches(branches, action):
 		    newbranch not in newbranch.limb.dependent_branches):
 		notice('        WARNING: not in branch_dependencies\n')
 
-	    if newbranch.subname.startswith('msd.'):
-		check_msd_branch(newbranch)
-
-
 	notice('\n')
 
 
@@ -459,91 +455,6 @@ def file_lines(branch, path):
     return git.call(cmd, stderr=None).splitlines()
 
 
-def check_kernel_defconfigs(branch):
-    '''
-    Ensure that each defconfig file in ./configs contains a
-    "# checksetconfig" line, and is newer than scripts/kconfig/baseconfig
-    '''
-
-    indent = ' ' * 8
-    cmd = ['git', 'ls-tree', '--name-only', '%s:configs' % branch.name]
-    try:
-	defconfig_names = git.call(cmd, stderr=None).splitlines()
-    except:
-	notice(indent + 'WARNING: No ./configs directory\n')
-	return
-
-    paths = []
-    commit_time = {}
-    checksetconfig = {}
-    for name in defconfig_names:
-	path = 'configs/%s' % name
-	paths.append(path)
-	for line in file_lines(branch, path):
-	    if line == '# checksetconfig':
-		checksetconfig[path] = True
-		break
-	else:
-	    checksetconfig[path] = False
-
-	cmd = ['git', 'log', '-1', '--pretty=format:%ct',
-		'--remove-empty', branch.name, '--', path]
-	commit_time[path] = int(git.call(cmd).strip())
-
-    if paths:
-	baseconfig_path = 'scripts/kconfig/baseconfig'
-	cmd = ['git', 'log', '-1', '--pretty=format:%ct',
-		'--remove-empty', branch.name, '--', baseconfig_path]
-	base_config_time = git.call(cmd)
-	if base_config_time:
-	    base_config_time = int(base_config_time.strip())
-
-	for path in paths:
-	    if not checksetconfig[path]:
-		notice((indent +
-			'WARNING: %s has no "# checksetconfig" line\n' % path) +
-			indent + 'Need to run "make checksetconfig".\n')
-	    elif base_config_time and base_config_time > commit_time[path]:
-		notice((indent +
-			'WARNING: %s is older than baseconfig.\n' % path) +
-			indent + 'Need to run "make checksetconfig".\n')
-
-
-def check_msd_conf(branch):
-    indent = ' ' * 8
-    path = 'MONTAVISTA/bitbake/conf/msd.conf'
-
-    try:
-	lines = file_lines(branch, path)
-    except:
-	return
-
-    sane_inc = None
-    for line in lines:
-	if line.startswith('MSD_VERSION'):
-	    notice(indent + "WARNING: obsolete variable: MSD_VERSION in %s\n"
-		    % path)
-	if line.startswith('include') or line.startswith('require'):
-	    if 'sane-' in line:
-		sane_inc = line
-
-    if not sane_inc:
-	notice(indent +
-	    "WARNING: %s doesn't require sane-XXXX.inc\n"
-	    % path)
-    
-
-def check_bitbake_files(branch):
-    check_msd_conf(branch)
-
-
-def check_msd_branch(branch):
-    if git.repo_type() == 'mvl7-kernel':
-        return
-    check_kernel_defconfigs(branch)
-    check_bitbake_files(branch)
-
-
 def do_analyze():
     global limb1_name
 
@@ -636,7 +547,6 @@ def main():
     try:
 	process_options()
 	git.check_repository()
-	git.require_mvl6_kernel_repo()
 	do_analyze()
 
     except git.GitError, e:

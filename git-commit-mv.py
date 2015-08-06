@@ -341,7 +341,7 @@ Disposition: %s
 
     if opt["delete_changeid"]:
 	changeid = None
-    elif opt['repo-type'] in ['mvl6-kernel', 'mvl7-kernel']:
+    else
 	if opt["changeid"]:
 	    changeid = opt["changeid"]
 	elif not changeid:
@@ -406,7 +406,6 @@ def main():
 	process_options()
 
 	git.check_repository()
-	opt['repo-type'] = git.repo_type()
 
 	commit_mv()
 
