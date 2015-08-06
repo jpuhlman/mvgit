@@ -368,10 +368,6 @@ def initialize_commits():
     merges_ok = config["merges_ok"]
     resetbugz = config["resetbugz"]
 
-    if not edit and bugz == None:
-	sys.stdout.write("Either of --edit or --bugz options is required")
-	sys.exit(1)
-
     if not commits:
 	commits = [x.strip().split()[0] for x in sys.stdin.readlines()]
 
