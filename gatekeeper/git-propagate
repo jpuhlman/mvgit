@@ -5,7 +5,7 @@ usage() {
 		echo "$*" 1>&2
 		echo 1>&2
 	fi
-	echo "Usage: $0 [[-c commitish|-c <count>] ...] --bugz <bugno> [<source-branch> [<dest-branch>...]]" 1>&2
+	echo "Usage: $0 [[-c commitish|-c <count>] ...] [--bugz <bugno> [--source --type --disposition ]] [<source-branch> [<dest-branch>...]]" 1>&2
 	exit 1
 }
 
