@@ -7,7 +7,7 @@ It includes functions to work with git limbs as defined for MVL6.
 '''
 
 # Author: Dale Farnsworth <dfarnsworth@mvista.com>
-# Copyright (C) 2009-2013 MontaVista Software, Inc.
+# Copyright (C) 2009-2015 MontaVista Software, Inc.
 #
 # This file is licensed under the terms of the GNU General Public License
 # version 2. This program is licensed "as is" without any warranty of any
@@ -30,6 +30,12 @@ def commit_contains(container, contained):
 class GitError(Exception):
     def __init__(self, msg):
         self.msg = msg
+
+class usage():
+    def __init__(self):
+        self.Source = "[MontaVista Software, LLC | URL | Some Guy <email@addr>]"
+        self.Type = "[Defect Fix | Security Fix | Enhancement | Integration]"
+        self.Disposition = "[Submitted to | Needs submitting to | Merged from | Rejected by | Backport | Local | MontaVista]"
 
 
 class cached_property(property):
