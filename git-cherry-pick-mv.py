@@ -314,6 +314,7 @@ def move_commits_to_original_branch():
 
 def check_mv_headers(ids):
     no_mv_header_ids = []
+    u  = git.usage()
 
     for id in ids:
 	commit = git.read_commit(id)
@@ -329,8 +330,11 @@ def check_mv_headers(ids):
 	    git.call(cmd, stdout=sys.stdout)
 	sys.stderr.write("To cherry-pick commits without an MV header, "
 	    "it is necessary to specify either\n"
-	    "--edit or all of these options: --source, --bugz, "
-	    "--type, --disposition\n")
+	    "--edit or all of these options: \n"
+        "--source %s\n"
+        "--bugz, "
+	    "--type %s\n"
+        "--disposition %s\n" % (u.Source, u.Type, u.Disposition))
 	sys.exit(1)
 
 
