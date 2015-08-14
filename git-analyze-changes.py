@@ -381,9 +381,13 @@ def summarize_commits(branches, action):
 
 def commit_signoffs(commit):
     re_signoff = re.compile(r'^Signed-off-by:[\s]*(.*)')
+    re_reviewed = re.compile(r'^Reviewed-by:[\s]*(.*)')
     signoffs = []
     for line in commit.body:
+	r = re_reviewed.match(line)
 	m = re_signoff.match(line)
+	if r:
+	    signoffs.append(r.group(1).rstrip())
 	if m:
 	    signoffs.append(m.group(1).rstrip())
     return signoffs
