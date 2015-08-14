@@ -6,6 +6,8 @@ Usage: git-signoff-mv [opts] <rev-list>
 		Instead of a "Signed-off-by" line, add an "Acked-by" line.
 	--nack
 		Instead of a "Signed-off-by" line, add an "Nacked-by" line.
+	--reviewed
+		Instead of a "Signed-off-by" line, add an "Reviewed-by" line.
 	--name <name>
 		Use <name> as the name in the sign-off.
 	--email <email>
@@ -69,7 +71,7 @@ def process_options():
     short_opts = "fn"
     long_opts = [
 	"help", "debug", "version", "ack",
-	"nack", "name=", "email=", "source=", "bugz=", "type=",
+	"nack", "reviewed", "name=", "email=", "source=", "bugz=", "type=",
 	"disposition=", "changeid=", "force",
     ]
 
@@ -94,6 +96,9 @@ def process_options():
 	    config["signoff"] = "Acked-by"
 	elif option == '--nack':
 	    config["signoff"] = "Nacked-by"
+	    noargs = True
+	elif option == '--reviewed':
+	    config["signoff"] = "Reviewed-by"
 	    noargs = True
 	elif option == '--name':
 	    name = value
