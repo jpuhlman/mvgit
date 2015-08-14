@@ -2,14 +2,14 @@
 """
 Usage: git-signoff-limb [opts] <limb1>..[<limb2>]
 	opts	These options are passed directly to git signoff-mv:
-		--ack, --name=<name>, --email=<email>
+		--ack, --reviewed, --name=<name>, --email=<email>
 		--bugz=<bugno>, --disposition=<disp>,
 		--source=<source>, --type=<type> ]
 
 Checks out each branch, branch_name, in <limb2>, and runs
 "git signoff-mv [opts] <limb1>/branch_name..".
 
-This will add signoff/ack lines to all commits that are in <limb2>
+This will add signoff/ack/reviewed lines to all commits that are in <limb2>
 that are not in <limb1>. The name of the current limb is substituted
 for <limb2> if it is omitted.
 """
@@ -40,7 +40,7 @@ def usage(msg=None):
 
 def process_options():
     short_opts = "f"
-    long_opts = [ "help", "debug", "ack", "force", "name=", "email=",
+    long_opts = [ "help", "debug", "ack", "reviewed", "force", "name=", "email=",
 		  "bugz=", "disposition=", "source=", "type=", "version" ]
 
     try:
