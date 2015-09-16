@@ -964,7 +964,15 @@ class Branch(Ref):
 	try:
 	    lines = call(['git', 'show', ref], stderr=None).splitlines()
 	except:
-	    lines = []
+            # If we don't find rejected changes in the current branch,
+            # look in MONTAVISTA/rejected_changes_<branchname> in the
+            # limb-info branch.
+            try:
+                filename = 'MONTAVISTA/rejected_changes_%s' % self.subname
+                ref = '%s:%s' % (self.limb.info_branch.name, filename)
+                lines = call(['git', 'show', ref], stderr=None).splitlines()
+            except:
+                lines = []
 
 	for line in lines:
 	    line = line.lstrip()

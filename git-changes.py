@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""
-Usage: git-changes [-l] [-v] [-a] [<left>] [<right>]
+"""Usage: git-changes [-l] [-v] [-a] [<left>] [<right>]
        git-changes --dependents <branch> [<limb> ...]
 
 If -l is specified:
@@ -21,9 +20,10 @@ If -l is not specified:
     appended to the its commit ID.
 
 If -a is specified include rejected_changes.  Normally, changes found
-one-per-line in the file MONTAVISTA/rejected_changes in the destination
-branch are omitted.  When -a is specified, all changes, including
-those in MONTAVISTA/rejected_changes are included in the output.
+one-per-line in the file MONTAVISTA/rejected_changes in the
+destination branch or or MONTAVISTA/rejected_changes_<branchname> in
+the limb-info branch are omitted.  When -a is specified, all changes,
+including those in rejected_changes are included in the output.
 
 Format of pending change status:
     Each line of change status consists of two integers, separated by
