@@ -31,7 +31,7 @@ class GitError(Exception):
     def __init__(self, msg):
         self.msg = msg
 
-class usage():
+class usage(object):
     def __init__(self):
         self.Source = "[MontaVista Software, LLC | URL | Some Guy <email@addr>]"
         self.Type = "[Defect Fix | Security Fix | Enhancement | Integration]"
