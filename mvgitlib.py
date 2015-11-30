@@ -847,6 +847,8 @@ class Branch(Ref):
 	tuples = []
 
 	for provider in self.providers:
+            if provider is self:
+                continue
 	    if 'reference' in self.provider_flags[provider]:
 		continue
 	    tuples += provider.provider_tuples_helper()
