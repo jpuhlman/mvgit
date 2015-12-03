@@ -25,7 +25,7 @@ import mvgitlib as git
 
 # Global Constants
 bugz_server = 'bugz.mvista.com'
-git_server = 'git.sh.mvista.com'
+git_server = 'git.mvista.com'
 git_base_dir = '/var/cache/git'
 debug_flag = False
 progname = ''
