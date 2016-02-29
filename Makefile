@@ -31,6 +31,7 @@ INSTALL = install
 PROGRAMS =
 SCRIPT_SH =
 SCRIPT_PYTHON =
+GK_SCRIPT_PYTHON =
 
 SCRIPT_SH += git-bulk-cherry-mv.sh
 SCRIPT_SH += git-push-mv.sh
@@ -52,11 +53,21 @@ SCRIPT_PYTHON += git-cherry-pick-mv.py
 SCRIPT_PYTHON += git-signoff-mv.py
 SCRIPT_PYTHON += git-commit-mv.py
 
-SCRIPTS = $(patsubst %.sh,%,$(SCRIPT_SH)) \
-	  $(patsubst %.py,%,$(SCRIPT_PYTHON))
+# Gatekeeper scripts, don't install by default, but still generate.
+GK_SCRIPT_PYTHON += gatekeeper/git-external-pull-mv.py
+
+ALL_SCRIPT_PYTHON = $(SCRIPT_PYTHON) $(GK_SCRIPT_PYTHON)
+
+INSTALL_SCRIPTS = $(patsubst %.sh,%,$(SCRIPT_SH)) \
+		  $(patsubst %.py,%,$(SCRIPT_PYTHON))
+
+ALL_SCRIPTS = $(patsubst %.sh,%,$(SCRIPT_SH)) \
+	      $(patsubst %.py,%,$(ALL_SCRIPT_PYTHON))
 
 # what 'all' will build and 'install' will install, in bindri
-ALL_PROGRAMS = $(PROGRAMS) $(SCRIPTS)
+ALL_PROGRAMS = $(PROGRAMS) $(ALL_SCRIPTS)
+
+INSTALL_PROGRAMS = $(PROGRAMS) $(INSTALL_SCRIPTS)
 
 # not built by 'all, but 'install' will install in bindir
 OTHER_INSTALL = mvgitlib.py
@@ -104,6 +115,8 @@ PYTHON_PATH_SQ = $(subst ','\'',$(PYTHON_PATH))
 
 export INSTALL DESTDIR SHELL_PATH
 
+X1:
+	echo $(ALL_SCRIPT_PYTHON)
 
 ### Build rules
 
@@ -128,7 +141,7 @@ $(patsubst %.sh,%,$(SCRIPT_SH)) : % : %.sh
 	chmod +x $@+ && \
 	mv $@+ $@
 
-$(patsubst %.py,%,$(SCRIPT_PYTHON)) : % : %.py
+$(patsubst %.py,%,$(ALL_SCRIPT_PYTHON)) : % : %.py
 	$(QUIET_GEN)$(RM) $@ $@+ && \
 	sed -e '1s|#!.*/python|#!$(PYTHON_PATH_SQ)|' \
 	    -e 's/@@MVGIT_VERSION@@/$(MVGIT_VERSION)/g' \
@@ -138,7 +151,7 @@ $(patsubst %.py,%,$(SCRIPT_PYTHON)) : % : %.py
 
 # These can record MVGIT_VERSION
 $(patsubst %.sh, %, $(SCRIPT_SH)) \
-	$(patsubst %.py,%,$(SCRIPT_PYTHON)) \
+	$(patsubst %.py,%,$(ALL_SCRIPT_PYTHON)) \
 	: MVGIT-VERSION-FILE
 
 doc:
@@ -168,7 +181,7 @@ remove-oldversions:
 
 install: all remove-oldversions
 	$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(bindir_SQ)'
-	$(INSTALL) $(ALL_PROGRAMS) $(OTHER_INSTALL) '$(DESTDIR_SQ)$(bindir_SQ)'
+	$(INSTALL) $(INSTALL_PROGRAMS) $(OTHER_INSTALL) '$(DESTDIR_SQ)$(bindir_SQ)'
 
 install-doc:
 	$(MAKE) -C Documentation install

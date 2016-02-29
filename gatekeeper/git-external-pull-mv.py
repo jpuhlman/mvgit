@@ -46,7 +46,7 @@ def get_source(s):
     """
     if not s.startswith("#"):
         return None
-    v = s[1:].split()
+    v = s[1:].strip().split()
     if len(v) != 2:
         return None
     if not (v[0].startswith("git://") or v[0].startswith("https://")):
