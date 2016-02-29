@@ -1,5 +1,13 @@
 #!/usr/bin/env python
-"""Usage: git-external-pull-mv [--sub-repo <origrepo>,<subrepo>]
+"""Usage: git-external-pull-mv [--sub-repo <origrepo>,<subrepo>] [<branches>]
+
+        [opts]
+        --sub-repo <origrepo>,<subrepo>
+                If a repository being pulled starts with <origrepo>,
+                then substitute <subrepo> for <origrepo>.  This allow
+                git forwarding to external repositories.
+        --list
+                only list the branches to fetch, don't merge them.
 
 Go through the branch dependency file (for the current limb) and pull
 all external repositories.  This script expects external repositories
@@ -17,24 +25,31 @@ and it will pull https://<repo> <extern branch> into fetch head and
 merge it (fast-forward only) into external.<branch>.  Any error
 terminates the script.
 
-        [opts]
-        --sub-repo <origrepo>,<subrepo>
-                If a repository being pulled starts with <origrepo>,
-                then substitute <subrepo> for <origrepo>.  This allow
-                git forwarding to external repositories.
-
+If a list of <branches> is provided, only fetch those branches.  Note
+that you don't put the limb name at the beginning of the branch, it is
+just the branch name by itself.  eg external.thunderx, not
+mvl-4.4/external.thunderx.
 """
 
 import sys
 import getopt
 import mvgitlib as git
 
+config = {
+    "sub-repos"         : [],
+    "branches"          : [],
+    "list"              : False
+}
+
 def extern_branch(s):
     """If the string is in the form '^external.<str>:' return the
     string without the final colon, otherwise return None.
     """
     if s.startswith("external.") and s.endswith(":"):
-        return s[:-1]
+        s = s[:-1]
+        if branches is not None and s not in branches:
+            return None
+        return s
     return None
 
 def get_source(s):
@@ -74,7 +89,7 @@ def usage(msg=None):
 
 def process_options():
     short_opts = "h"
-    long_opts = [ "help", "version", "sub-repo=" ]
+    long_opts = [ "help", "version", "sub-repo=", "list" ]
 
     try:
         options, args = getopt.getopt(sys.argv[1:], short_opts, long_opts)
@@ -88,19 +103,23 @@ def process_options():
 	elif option == '--version':
 	    sys.stdout.write('mvgit version %s\n' % "@@MVGIT_VERSION@@")
 	    sys.exit(0)
+	elif option == "--list":
+            config["list"] = True
 	elif option == "--sub-repo":
             s = value.split(",")
             if len(s) != 2:
                 sys.stderr.write("Invalid sub-repo value: " + value + "\n")
                 sys.exit(1)
-            sub_repos.append(s)
+            config["sub-repos"].append(s)
         else:
             sys.stderr.write("Unknown option: " + option + "\n")
             sys.exit(1)
-    
-    return
 
-sub_repos = []
+    if len(args) == 0:
+        config["branches"] = None
+    else:
+        config["branches"] = args
+    return
 
 def do_sub_repos(r):
     for v in sub_repos:
@@ -111,6 +130,9 @@ def do_sub_repos(r):
     return r
 
 process_options()
+
+branches = config["branches"]
+sub_repos = config["sub-repos"]
 
 limb = git.current_limb()
 
@@ -129,6 +151,10 @@ for i in range(1, len(deplines)):
     branch = limb.name + "/" + branch
 
     # If we get here we have an external branch.
+
+    if (config["list"]):
+        print "Merge %s from %s %s" % (branch, src[0], src[1])
+        continue
 
     git_call_with_err(["git", "checkout", branch],
                       "Could not check out " + branch)
