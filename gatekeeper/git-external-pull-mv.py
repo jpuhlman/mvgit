@@ -18,7 +18,7 @@ external.<branch>:
 
 or
 
-#https://<repo> <extern branch>
+#http[s]://<repo> <extern branch>
 external.<branch>:
 
 and it will pull https://<repo> <extern branch> into fetch head and
@@ -55,6 +55,7 @@ def extern_branch(s):
 def get_source(s):
     """If the line is in one of the following forms:
     #git://repo branch
+    #http://repo branch
     #https://repo branch
     then return a vector with the full repo and branch, otherwise
     return None.
@@ -64,7 +65,8 @@ def get_source(s):
     v = s[1:].strip().split()
     if len(v) != 2:
         return None
-    if not (v[0].startswith("git://") or v[0].startswith("https://")):
+    if not (v[0].startswith("git://") or v[0].startswith("https://") or
+            v[0].startswith("http://")):
         return None
     return v
 
