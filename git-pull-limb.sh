@@ -8,9 +8,9 @@ if [ "x$*" != "x" ]; then
 	exit 1
 fi
 
-LIMB_LIST=`git limb | sed 's/^[^ ][^ ]*//'`
-if [ "x$LIMB_LIST" = "x" ]; then
-	echo "Problem listing the limb, are you on a limb?" >&2
+LIMB=`git limb 2>/dev/null | grep '^[^ \*]' | sed 's%/$%%'`
+if [ -z "$LIMB" ]; then
+	echo "You do not appear to be on a limb." >&2
 	exit 1
 fi
 
@@ -21,6 +21,8 @@ if [ "x$CURR_BRANCH" = "x" ]; then
 fi
 
 git fetch
+
+LIMB_LIST=`git branch -a | grep "origin/$LIMB" | sed 's%  remotes/origin/%%'`
 
 for i in $LIMB_LIST; do
 	git checkout $i
