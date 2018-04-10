@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """
 Usage: git-limb
-       git-limb [-f ] [-R] [<limb1>] [<limb2>]
+       git-limb [-f] [-c] [-R] [<limb1>] [<limb2>]
        git-limb [-m | -M] [-R] [<oldlimb>] <newlimb>
        git-limb [-d] [-R] <limb>
-       git-limb [--deps] [<limb>
+       git-limb [--deps] [<limb>]
 
 With no arguments given, a list of branches in the current limb will
 be shown, the current branch will be highlighted with an asterisk.
@@ -30,7 +30,8 @@ Otherwise, if <limb1> is specified, a new limb, named <limb1> is
 created, containing copies of all the branches in <limb2>, or the
 current limb if <limb2> is omitted.  If <limb1> already exists, it
 will not be overwritten unless -f is specified.  If -R is specified,
-sub-limbs are also copied.
+sub-limbs are also copied.  If -c is specified, the first branch
+in the new limb is checked out.
 """
 
 import sys
